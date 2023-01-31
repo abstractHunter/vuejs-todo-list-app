@@ -7,55 +7,25 @@
     </div>
 
     <div class="state-lists">
-      <div
-        class="drop-zone todo-list"
-        @drop="onDrop($event, 'todo')"
-        @dragover.prevent
-        @dragenter.prevent
-      >
+      <div class="drop-zone todo-list" @drop="onDrop($event, 'todo')" @dragover.prevent @dragenter.prevent>
         <h3>To Do</h3>
         <ul>
-          <TodoListItem
-            v-for="item in toDoItems"
-            :key="item.id"
-            :item="item"
-            @delete-item="deteteItem"
-            @dragstart="startDrag($event, item)"
-          />
+          <TodoListItem v-for="item in toDoItems" :key="item.id" :item="item" @delete-item="deteteItem"
+            @dragstart="startDrag($event, item)" />
         </ul>
       </div>
-      <div
-        class="drop-zone doing-list"
-        @drop="onDrop($event, 'doing')"
-        @dragover.prevent
-        @dragenter.prevent
-      >
+      <div class="drop-zone doing-list" @drop="onDrop($event, 'doing')" @dragover.prevent @dragenter.prevent>
         <h3>Doing</h3>
         <ul>
-          <TodoListItem
-            v-for="item in doingItems"
-            :key="item.id"
-            :item="item"
-            @delete-item="deteteItem"
-            @dragstart="startDrag($event, item)"
-          />
+          <TodoListItem v-for="item in doingItems" :key="item.id" :item="item" @delete-item="deteteItem"
+            @dragstart="startDrag($event, item)" />
         </ul>
       </div>
-      <div
-        class="drop-zone done-list"
-        @drop="onDrop($event, 'done')"
-        @dragover.prevent
-        @dragenter.prevent
-      >
+      <div class="drop-zone done-list" @drop="onDrop($event, 'done')" @dragover.prevent @dragenter.prevent>
         <h3>Done</h3>
         <ul>
-          <TodoListItem
-            v-for="item in doneItems"
-            :key="item.id"
-            :item="item"
-            @delete-item="deteteItem"
-            @dragstart="startDrag($event, item)"
-          />
+          <TodoListItem v-for="item in doneItems" :key="item.id" :item="item" @delete-item="deteteItem"
+            @dragstart="startDrag($event, item)" />
         </ul>
       </div>
     </div>
@@ -68,14 +38,19 @@
   flex-direction: column;
   align-items: center;
 }
+
 .input-box input {
   width: 300px;
   height: 30px;
-  border: 1px solid #ccc;
+  border: 2px solid #bbb;
   border-radius: 5px;
   padding: 5px;
   margin: 10px;
+  opacity: 0.7;
+  height: 40px;
+  font-size: large;
 }
+
 .input-box button {
   background-color: #05445e;
   border: none;
@@ -85,12 +60,14 @@
   color: #d4f1f4;
   font-weight: bold;
 }
+
 .state-lists {
   display: flex;
   justify-content: space-between;
   width: 900px;
   margin-top: 40px;
 }
+
 .drop-zone {
   width: 300px;
   min-height: 300px;
@@ -103,15 +80,19 @@
   flex-direction: column;
   align-items: center;
 }
+
 .todo-list {
   background-color: #e0b0b0;
 }
+
 .doing-list {
   background-color: #b0b0e0;
 }
+
 .done-list {
   background-color: #b0e0b0;
 }
+
 ul {
   padding: 0;
   margin: 0;
@@ -163,11 +144,13 @@ export default {
       this.newItem = "";
       this.currentIndex++;
       console.log("createItem", this.items);
+      this.updateLocalStorage();
     },
 
     deteteItem(id) {
       this.items = this.items.filter((item) => item.id !== id);
       console.log("deteteItem");
+      this.updateLocalStorage();
     },
 
     startDrag(evt, item) {
@@ -180,7 +163,23 @@ export default {
       const itemID = parseInt(evt.dataTransfer.getData("itemID"));
       const item = this.items.find((item) => item.id === itemID);
       item.state = state;
+      this.updateLocalStorage();
     },
+
+    updateLocalStorage() {
+      localStorage.setItem("items", JSON.stringify(this.items));
+    },
+
+    getLocalStorage() {
+      const items = JSON.parse(localStorage.getItem("items"));
+      if (items) {
+        this.items = items;
+      }
+    },
+  },
+
+  created() {
+    this.getLocalStorage();
   },
 
   computed: {
